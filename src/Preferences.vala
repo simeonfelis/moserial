@@ -35,16 +35,24 @@ public class Preferences : GLib.Object
 	public bool recordLaunch {get; construct;}
 	public bool enableTimeout {get; construct;}
 	public int timeout {get; construct;}
-	
-	public Preferences (bool useSystemMonospaceFont, string? font, string? fontColor,string? backgroundColor,string? highlightColor, bool recordLaunch, bool enableTimeout, int timeout) {
+	public bool recordAutoName{get; construct;}
+	public int recordAutoDirection{get; construct;}
+
+	public Preferences (bool useSystemMonospaceFont, string? font,
+	                    string? fontColor,string? backgroundColor,
+	                    string? highlightColor, bool recordLaunch,
+	                    bool enableTimeout, int timeout,
+	                    bool recordAutoName, int recordAutoDirection) {
 		GLib.Object(useSystemMonospaceFont: useSystemMonospaceFont,
-			font: font, 
-			recordLaunch: recordLaunch, 
-			fontColor: fontColor, 
-			backgroundColor: backgroundColor, 
-			highlightColor: highlightColor, 
-			enableTimeout: enableTimeout, 
-			timeout: timeout);
+			font: font,
+			recordLaunch: recordLaunch,
+			fontColor: fontColor,
+			backgroundColor: backgroundColor,
+			highlightColor: highlightColor,
+			enableTimeout: enableTimeout,
+			timeout: timeout,
+			recordAutoName: recordAutoName,
+			recordAutoDirection: recordAutoDirection);
 	}
 	construct {
 		if(font==null)
@@ -88,6 +96,12 @@ public class Preferences : GLib.Object
 			stdout.printf("true\n");
 		else
 			stdout.printf("false\n");
+		stdout.printf("recordAutoName: ");
+		if(recordAutoName)
+			stdout.printf("true\n");
+		else
+			stdout.printf("false\n");
+		stdout.printf("recordAutoDirection: %d", recordAutoDirection);
 		
 	}
 	public void saveToProfile(Profile profile) {
@@ -99,6 +113,8 @@ public class Preferences : GLib.Object
 		profile.keyFile.set_boolean("preferences", "record_launch", recordLaunch);
 		profile.keyFile.set_boolean("preferences", "enable_timeout", enableTimeout);
 		profile.keyFile.set_integer("preferences", "timeout", timeout);
+		profile.keyFile.set_boolean("preferences", "record_auto_name", recordAutoName);
+		profile.keyFile.set_integer("preferences", "record_auto_direction", recordAutoDirection);
 	}
 	public static Preferences loadFromProfile(Profile profile) {
 		bool useSystemMonospaceFont;
@@ -109,6 +125,8 @@ public class Preferences : GLib.Object
 		bool recordLaunch;
 		bool enableTimeout;
 		int timeout;
+		bool recordAutoName;
+		int recordAutoDirection;
 
 		useSystemMonospaceFont = MoUtils.getKeyBoolean(profile, "preferences", "use_system_monospace_font", Preferences.DEFAULT_USE_SYSTEM_MONOSPACE_FONT);
 		font = MoUtils.getKeyString(profile, "preferences", "font");	
@@ -118,7 +136,9 @@ public class Preferences : GLib.Object
 		recordLaunch = MoUtils.getKeyBoolean(profile, "preferences", "record_launch", true);
 		enableTimeout = MoUtils.getKeyBoolean(profile, "preferences", "enable_timeout", false);
 		timeout = MoUtils.getKeyInteger(profile, "preferences", "timeout", 30);
-		return new Preferences (useSystemMonospaceFont, font, fontColor, backgroundColor, highlightColor, recordLaunch, enableTimeout, timeout);
+		recordAutoName = MoUtils.getKeyBoolean(profile, "preferences", "record_auto_name", false);
+		recordAutoDirection = MoUtils.getKeyInteger(profile, "preferences", "record_auto_direction", 0);
+		return new Preferences (useSystemMonospaceFont, font, fontColor, backgroundColor, highlightColor, recordLaunch, enableTimeout, timeout, recordAutoName, recordAutoDirection);
 	
 	}
 }
