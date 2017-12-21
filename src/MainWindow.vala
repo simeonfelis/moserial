@@ -681,6 +681,7 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                 statusbar.pop(statusbarContext);
                 statusbar.push(statusbarContext, currentSettings.getStatusbarString(true));
                 serialConnection.newData.connect(this.updateIncoming);
+                serialConnection.onError.connect(this.connectionError);
                 connectButton.set_label_widget(disconnectLabel);
                 return true;
         }
@@ -692,6 +693,7 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                         settingsButton.set_sensitive(true);
                         serialConnection.doDisconnect();
                         serialConnection.newData.disconnect(this.updateIncoming);
+                        serialConnection.onError.disconnect(this.connectionError);
                         bytecountbar.pop(bytecountbarContext);
                         bytecountbar.push(bytecountbarContext, serialConnection.getBytecountbarString());
                         //serialConnection = new SerialConnection();
@@ -703,6 +705,23 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                                 recordButton.set_active(false);
                 }
         }
+
+	private void connectionError() {
+		settingsButton.set_sensitive(true);
+		serialConnection.doDisconnect();
+		serialConnection.newData.disconnect(this.updateIncoming);
+		serialConnection.onError.disconnect(this.connectionError);
+		bytecountbar.pop(bytecountbarContext);
+		bytecountbar.push(bytecountbarContext, serialConnection.getBytecountbarString());
+		//serialConnection = new SerialConnection();
+		statusbar.pop(statusbarContext);
+		statusbar.push(statusbarContext, currentSettings.getStatusbarString(false));
+		connectButton.set_label_widget(connectLabel);
+		connectButton.set_active(false);
+
+		if (recordButton.get_active())
+			recordButton.set_active(false);
+	}
 
 	private void updateIncoming(SerialConnection sc, uchar[] data, int size) {
                 if (rz.running) {
