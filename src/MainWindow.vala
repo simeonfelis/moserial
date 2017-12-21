@@ -546,7 +546,13 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
 				var minute = now.get_minute();
 				var second = now.get_second();
 				string home = Environment.get_home_dir ();
-				string filename = "%s/moserial_%04d-%02d-%02d_%02d-%02d-%02d.txt".printf(home, year, month, day, hour, minute, second);
+				string pExtension = currentPreferences.recordAutoExtension;
+				string extension = "";
+				if (pExtension!="") {
+					extension = ".%s".printf(pExtension);
+				}
+				string filename = "%s/moserial_%04d-%02d-%02d_%02d-%02d-%02d%s".printf(
+					home, year, month, day, hour, minute, second, extension);
 				SerialStreamRecorder.Direction direction;
 				switch(currentPreferences.recordAutoDirection)
 				{
