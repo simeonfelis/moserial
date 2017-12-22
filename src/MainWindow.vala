@@ -99,6 +99,9 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
 	private Adjustment va4;
 	private Gtk.AccelGroup ag;
 
+	private ToggleToolButton rtsButton;
+	private ToggleToolButton dtrButton;
+
 	private const string recentGroup = "moserial-configs";
 	private Gtk.RecentData recentData;
 
@@ -226,6 +229,16 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
 		connectButton.set_tooltip_text (_("Open/close port"));
                 disconnectLabel = (Label)builder.get_object("disconnect_label");
                 connectLabel = (Label)builder.get_object("connect_label");
+
+                // setup RTS/DTR
+                rtsButton = (ToggleToolButton)builder.get_object("toolbar_rts");
+                rtsButton.toggled.connect(this.rtsButtonClicked);
+                rtsButton.set_tooltip_text(_("Toogle RTS line. Not available when Hardware handshake enabled."));
+                rtsButton.set_sensitive(false);
+                dtrButton = (ToggleToolButton)builder.get_object("toolbar_dtr");
+                dtrButton.toggled.connect(this.dtrButtonClicked);
+                dtrButton.set_tooltip_text(_("Toogle DTR line. Not available when Hardware handshake enabled."));
+                dtrButton.set_sensitive(false);
 
                 //setup help
                 Gtk.ImageMenuItem contents = (Gtk.ImageMenuItem)builder.get_object("menubar_contents");
@@ -689,6 +702,19 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                 serialConnection.newData.connect(this.updateIncoming);
                 serialConnection.onError.connect(this.connectionError);
                 connectButton.set_label_widget(disconnectLabel);
+
+		if (currentSettings.handshake==Settings.Handshake.SOFTWARE ||
+			currentSettings.handshake == Settings.Handshake.BOTH ||
+			currentSettings.handshake == Settings.Handshake.HARDWARE) {
+			rtsButton.set_sensitive(false);
+			rtsButton.set_stock_id("gtk-no");
+			dtrButton.set_sensitive(false);
+			dtrButton.set_stock_id("gtk-no");
+		}
+		else {
+			rtsButton.set_sensitive(true);
+			dtrButton.set_sensitive(true);
+		}
                 return true;
         }
 
@@ -707,10 +733,35 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                         statusbar.push(statusbarContext, currentSettings.getStatusbarString(false));
                         button.set_label_widget(connectLabel);
 
+			dtrButton.set_sensitive(false);
+			dtrButton.set_active(false);
+			rtsButton.set_sensitive(false);
+			rtsButton.set_active(false);
+
                         if (recordButton.get_active())
                                 recordButton.set_active(false);
                 }
         }
+
+	private void dtrButtonClicked(ToggleToolButton button) {
+		serialConnection.setDtr(button.get_active());
+		if (button.get_active()) {
+			button.set_stock_id("gtk-yes");
+		}
+		else {
+			button.set_stock_id("gtk-no");
+		}
+	}
+
+	private void rtsButtonClicked(ToggleToolButton button) {
+		serialConnection.setRts(button.get_active());
+		if (button.get_active()) {
+			button.set_stock_id("gtk-yes");
+		}
+		else {
+			button.set_stock_id("gtk-no");
+		}
+	}
 
 	private void connectionError() {
 		settingsButton.set_sensitive(true);

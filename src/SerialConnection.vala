@@ -325,4 +325,28 @@ public class moserial.SerialConnection : GLib.Object
 			r = _("TX: %lu, RX: %lu").printf(tx, rx);
                 return r;
         }
+
+	public void setRts(bool enable) {
+		int mcs=0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if (enable) {
+			mcs |= Linux.Termios.TIOCM_RTS;
+		}
+		else {
+			mcs &= ~Linux.Termios.TIOCM_RTS;
+		}
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
+	}
+
+	public void setDtr(bool enable) {
+		int mcs=0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if (enable) {
+			mcs |= Linux.Termios.TIOCM_DTR;
+		}
+		else {
+			mcs &= ~Linux.Termios.TIOCM_DTR;
+		}
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
+	}
 }
