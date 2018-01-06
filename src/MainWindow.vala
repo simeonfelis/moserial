@@ -99,6 +99,9 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
 	private Adjustment va4;
 	private Gtk.AccelGroup ag;
 
+	private ToggleToolButton rtsButton;
+	private ToggleToolButton dtrButton;
+
 	private const string recentGroup = "moserial-configs";
 	private Gtk.RecentData recentData;
 
@@ -226,6 +229,15 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
 		connectButton.set_tooltip_text (_("Open/close port"));
                 disconnectLabel = (Label)builder.get_object("disconnect_label");
                 connectLabel = (Label)builder.get_object("connect_label");
+
+                // setup RTS/DTR
+                rtsButton = (ToggleToolButton)builder.get_object("toolbar_rts");
+                rtsButton.set_tooltip_text(_("Toogle RTS line. Disabled while handshake active."));
+                rtsButton.set_sensitive(false);
+                dtrButton = (ToggleToolButton)builder.get_object("toolbar_dtr");
+                dtrButton.set_tooltip_text(_("Toogle DTR line. Disabled while handhake active."));
+                dtrButton.set_sensitive(false);
+                // signal is connected after port is connected
 
                 //setup help
                 Gtk.ImageMenuItem contents = (Gtk.ImageMenuItem)builder.get_object("menubar_contents");
@@ -654,6 +666,42 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                 statusbar.push(statusbarContext, currentSettings.getStatusbarString(true));
                 serialConnection.newData.connect(this.updateIncoming);
                 connectButton.set_label_widget(disconnectLabel);
+
+		if (currentSettings.handshake==Settings.Handshake.SOFTWARE ||
+			currentSettings.handshake == Settings.Handshake.BOTH ||
+			currentSettings.handshake == Settings.Handshake.HARDWARE) {
+			rtsButton.set_sensitive(false);
+			rtsButton.set_stock_id("gtk-no");
+			dtrButton.set_sensitive(false);
+			dtrButton.set_stock_id("gtk-no");
+		}
+		else {
+			dtrButton.toggled.disconnect(this.dtrButtonClicked);
+			rtsButton.toggled.disconnect(this.rtsButtonClicked);
+
+			if (serialConnection.getRts()) {
+				rtsButton.set_active(true);
+				rtsButton.set_stock_id("gtk-yes");
+			}
+			else {
+				rtsButton.set_active(false);
+				rtsButton.set_stock_id("gtk-no");
+
+			}
+			if (serialConnection.getDtr()) {
+				dtrButton.set_active(true);
+				dtrButton.set_stock_id("gtk-yes");
+			}
+			else {
+				dtrButton.set_active(false);
+				dtrButton.set_stock_id("gtk-no");
+			}
+			dtrButton.toggled.connect(this.dtrButtonClicked);
+			rtsButton.toggled.connect(this.rtsButtonClicked);
+
+			rtsButton.set_sensitive(true);
+			dtrButton.set_sensitive(true);
+		}
                 return true;
         }
 
@@ -671,10 +719,40 @@ public class moserial.MainWindow : Gtk.Window //Have to extend Gtk.Winow to get 
                         statusbar.push(statusbarContext, currentSettings.getStatusbarString(false));
                         button.set_label_widget(connectLabel);
 
+			dtrButton.toggled.disconnect(this.dtrButtonClicked);
+			rtsButton.toggled.disconnect(this.rtsButtonClicked);
+
+			dtrButton.set_sensitive(false);
+			dtrButton.set_active(false);
+			dtrButton.set_stock_id("gtk-no");
+			rtsButton.set_sensitive(false);
+			rtsButton.set_active(false);
+			rtsButton.set_stock_id("gtk-no");
+
                         if (recordButton.get_active())
                                 recordButton.set_active(false);
                 }
         }
+
+	private void dtrButtonClicked(ToggleToolButton button) {
+		serialConnection.setDtr(button.get_active());
+		if (button.get_active()) {
+			button.set_stock_id("gtk-yes");
+		}
+		else {
+			button.set_stock_id("gtk-no");
+		}
+	}
+
+	private void rtsButtonClicked(ToggleToolButton button) {
+		serialConnection.setRts(button.get_active());
+		if (button.get_active()) {
+			button.set_stock_id("gtk-yes");
+		}
+		else {
+			button.set_stock_id("gtk-no");
+		}
+	}
 
 	private void updateIncoming(SerialConnection sc, uchar[] data, int size) {
                 if (rz.running) {

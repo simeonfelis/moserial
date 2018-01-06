@@ -284,16 +284,18 @@ public class moserial.SerialConnection : GLib.Object
 		//newtio.c_cflag |= CREAD;
 		//newtio.c_cc[VTIME] = 5;
 
-                int mcs=0;
-                Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
-                mcs |= Linux.Termios.TIOCM_RTS;
-                Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
 
-                if (settings.handshake == Settings.Handshake.HARDWARE || settings.handshake == Settings.Handshake.BOTH)
-                        newtio.c_cflag |= Linux.Termios.CRTSCTS;
-                else
-                        newtio.c_cflag &= ~Linux.Termios.CRTSCTS;
-        }
+		if (settings.handshake == Settings.Handshake.HARDWARE || settings.handshake == Settings.Handshake.BOTH) {
+			int mcs=0;
+			Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+			mcs |= Linux.Termios.TIOCM_RTS;
+			Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
+			newtio.c_cflag |= Linux.Termios.CRTSCTS;
+		}
+		else {
+			newtio.c_cflag &= ~Linux.Termios.CRTSCTS;
+		}
+	}
 
         public string getBytecountbarString() {
                 string r;
@@ -304,4 +306,46 @@ public class moserial.SerialConnection : GLib.Object
 			r = _("TX: %lu, RX: %lu").printf(tx, rx);
                 return r;
         }
+
+	public void setRts(bool enable) {
+		int mcs=0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if (enable) {
+			mcs |= Linux.Termios.TIOCM_RTS;
+		}
+		else {
+			mcs &= ~Linux.Termios.TIOCM_RTS;
+		}
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
+	}
+
+	public bool getRts() {
+		int mcs = 0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if ((mcs & Linux.Termios.TIOCM_RTS) == Linux.Termios.TIOCM_RTS) {
+			return true;
+		}
+		return false;
+	}
+
+	public void setDtr(bool enable) {
+		int mcs=0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if (enable) {
+			mcs |= Linux.Termios.TIOCM_DTR;
+		}
+		else {
+			mcs &= ~Linux.Termios.TIOCM_DTR;
+		}
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMSET, out mcs);
+	}
+
+	public bool getDtr() {
+		int mcs = 0;
+		Posix.ioctl(m_fd, Linux.Termios.TIOCMGET, out mcs);
+		if ((mcs & Linux.Termios.TIOCM_DTR) == Linux.Termios.TIOCM_DTR) {
+			return true;
+		}
+		return false;
+	}
 }

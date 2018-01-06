@@ -149,6 +149,12 @@
         between 0 and 31.
       </para>
       <para>
+        When no handhake mode is enabled, the DTR (Data Terminal Ready) and RTS
+        (Request To Send) lines can be toggled manually. In this case, upon port
+        connection, the state of the DTR and RTS lines are determined and displayed
+        as soon as a port is connected.
+      </para>
+      <para>
         A local echo can be enabled from this dialog. If enabled, all data that &app;
         receives will be echoed back to the sending device. This should normally be
         disabled, as it can cause unexpected behaviour, especially if the remote device
@@ -365,6 +371,20 @@
       It relies on the standard rz and sz utilities to send and receive data.
       These utilities, part of the lrzsz package, must be installed on your
       system.
+    </para>
+  </sect1>
+
+  <sect1 id="rts_dtr">
+    <title>RTS and DTR</title>
+    <para>
+      With &app; the RTS (Request to Send) and DTR (Data Terminal Ready) line can
+      be set manually. These buttons are only enabled when no handshare mode is
+      enabled in the <guilabel>Port Setup</guilabel> dialog.
+    </para>
+    <para>
+      Upon connect of a serial port, the status of the RTS and DTR line are read
+      and displayed. When the a button is active the corresponding line is high,
+      low otherwise.
     </para>
   </sect1>
 
