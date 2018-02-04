@@ -144,8 +144,16 @@
         any system default settings for the port.
       </para>
       <para>
-        The &app; port setup dialog will only list the /dev/ttySnn, /dev/ttyUSBnn,
-        and /dev/rfcommnn ports that actually exist on the system, for values of "nn"
+        The &app; port setup dialog will only list the following device types:
+        <itemizedlist>
+          <listitem>/dev/ttySnn</listitem>
+          <listitem>/dev/ttyUSBnn</listitem>
+          <listitem>/dev/ttyACMnn</listitem>
+          <listitem>/dev/ttyrfcommnn</listitem>
+          <listitem>/dev/ttycuaUnn</listitem>
+          <listitem>/dev/ttycuann</listitem>
+        </itemizedlist>
+        The ports must actually exist on the system, for values of "nn"
         between 0 and 31.
       </para>
       <para>
