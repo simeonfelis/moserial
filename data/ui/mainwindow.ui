@@ -337,10 +337,50 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbar_help">
+              <object class="GtkToggleToolButton" id="toolbar_rts">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="is_important">True</property>
+                <property name="label" translatable="yes">RTS</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-no</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleToolButton" id="toolbar_dtr">
                 <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="is_important">True</property>
+                <property name="label" translatable="yes">DTR</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-no</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem" id="toolbutton2">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="toolbar_help">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="is_important">True</property>
                 <property name="label" translatable="yes">Help</property>
                 <property name="use_underline">True</property>
